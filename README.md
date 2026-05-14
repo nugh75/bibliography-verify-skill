@@ -6,6 +6,16 @@ Cross-reference bibliographic entries against:
 - **OPAC SBN** — Italian library catalog (books)
 - **DOAJ** — open access journals
 
+## Install
+
+```bash
+# As a git submodule in your project
+git submodule add git@github.com:nugh75/bibliography-verify-skill.git .claude/skills/bibliography-verify
+
+# Or clone standalone
+git clone git@github.com:nugh75/bibliography-verify-skill.git
+```
+
 ## Prerequisites
 
 ```bash
