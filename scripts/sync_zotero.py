@@ -59,6 +59,11 @@ def main():
             all_bibtex.append(chunk)
         start += 100
 
+    if total == 0:
+        print("WARNING: Zotero library is empty. Skipping write to avoid data loss.")
+        print("Popola la collezione Zotero e riprova, oppure usa import_bib_to_zotero.py")
+        return
+
     combined = "% Bibliography (synced from Zotero)\n\n"
     combined += "\n".join(all_bibtex)
     combined = combined.rstrip() + "\n"
