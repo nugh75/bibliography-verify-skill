@@ -8,7 +8,7 @@ description: |
   validate, or audit bibliography entries.
 ---
 
-# Bibliography Verify Skill
+# Bibliography Verify Skill `bibs`
 
 Orchestrates multiple CLI tools to cross-reference bib entries against
 scholarly databases. Detects missing entries, wrong years, author mismatches,
