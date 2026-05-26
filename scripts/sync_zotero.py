@@ -27,13 +27,17 @@ HEADERS = {"Zotero-API-Key": API_KEY}
 
 
 def fetch_bibtex_chunk(start=0, limit=100):
-    """Fetch one page of items in BibTeX format."""
+    """Fetch one page of items in BibTeX format.
+
+    Uses Zotero API v3. Attachments and notes have BibTeX format 'misc'
+    with note/attachment-specific fields; we keep them in the response
+    and let the user decide which entries to retain.
+    """
     url = f"{BASE_URL}/items"
     params = {
         "format": "bibtex",
         "limit": limit,
         "start": start,
-        "itemType": "-attachment || -note",
     }
     resp = requests.get(url, headers=HEADERS, params=params)
     resp.raise_for_status()
