@@ -1,10 +1,7 @@
 # bibliography-verify
 
-Cross-reference bibliographic entries against:
-- **OpenAlex** — academic papers, books, chapters
-- **Semantic Scholar** — papers, citations  
-- **OPAC SBN** — Italian library catalog (books)
-- **DOAJ** — open access journals
+Audit BibTeX metadata against OpenAlex, Semantic Scholar, and OPAC SBN.
+Each provider reports its search outcome separately.
 
 ## Install
 
@@ -16,36 +13,16 @@ git submodule add git@github.com:nugh75/bibliography-verify-skill.git .claude/sk
 git clone git@github.com:nugh75/bibliography-verify-skill.git
 ```
 
-## Prerequisites
-
-```bash
-# CLIs (install with go1.26.3 from each project dir)
-# openalex-pp-cli
-export OPENALEX_MAILTO="your.email@example.com"
-
-# Python deps
-pip install scholarly
-```
-
 ## Usage
 
-```bash
-# Verify all entries
-python3 scripts/verify_all.py
-
-# Verify Italian books on OPAC SBN
-python3 scripts/verify_opac.py
-```
-
-## CLI Manual Queries
+Run from the project root with Python 3.9 or newer. Set `OPENALEX_API_KEY`
+in the environment if you have an OpenAlex key. See
+[OpenAlex authentication](https://help.openalex.org/api/authentication/).
 
 ```bash
-# OpenAlex
-openalex-pp-cli search --query "title keywords"
-
-# OPAC SBN
-opac-sbn-pp-cli search-json --any "author title" --rows 5 --json
-
-# Semantic Scholar
-semantic-scholar-pp-cli paper get-graph-relevance-search --query "title"
+python3 .claude/skills/bibliography-verify/scripts/verify_all.py
+python3 .claude/skills/bibliography-verify/scripts/verify_all.py --source openalex --key my-citation
+python3 .claude/skills/bibliography-verify/scripts/verify_all.py --source opac-sbn --bib other.bib
 ```
+
+See [SKILL.md](SKILL.md) for all modes and the report statuses.
