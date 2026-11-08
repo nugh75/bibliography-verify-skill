@@ -1,72 +1,36 @@
 ---
 name: bibliography-verify
-description: |
-  Verify and enrich bibliographic references using multiple scholarly APIs:
-  OpenAlex, Semantic Scholar, OPAC SBN, DOAJ, and Google Scholar (via
-  scholarly). Generates a structured audit report comparing each bib entry
-  against available sources. Active when the user asks to check, verify,
-  validate, or audit bibliography entries.
+description: Audit BibTeX titles, authors, years, and identifiers against OpenAlex, Semantic Scholar, and OPAC SBN. Use when the user requests verification of existing bibliography entries.
 ---
 
-# Bibliography Verify Skill `bibs`
+# Bibliography Verify
 
-Orchestrates multiple CLI tools to cross-reference bib entries against
-scholarly databases. Detects missing entries, wrong years, author mismatches,
-and suggests DOIs or stable IDs.
+Run `scripts/verify_all.py` from the project root with Python 3.9 or newer.
+It reads `bibliography/reference.bib` by default. Override the path with
+`--bib` or `BIBLIOGRAPHY_BIB_PATH`.
 
-## Prerequisites
-
-| Tool | Install | Auth |
-|------|---------|------|
-| `openalex-pp-cli` | In `openalex-pp-cli/` | `OPENALEX_MAILTO` |
-| `semantic-scholar-pp-cli` | In `semantic-scholar-pp-cli/` | None (rate-limited) |
-| `opac-sbn-pp-cli` | In `opac-sbn-pp-cli/` | None |
-| `doaj-pp-cli` | In `doaj-pp-cli/` | None |
-| `scholarly` (Python) | `pip install scholarly` | None (Captcha-prone) |
-| `bib_verify_online.py` | `article-revision/scripts/bib_verify_online.py` | `OPENALEX_MAILTO` |
-
-## Slash Commands
-
-| Command | Action |
+| Request | Arguments |
 |---|---|
-| `/bib-verify all` | Check ALL bib entries against all available sources |
-| `/bib-verify openalex` | Check entries against OpenAlex only |
-| `/bib-verify ss` | Check entries against Semantic Scholar only |
-| `/bib-verify opac` | Check Italian books against OPAC SBN |
-| `/bib-verify missing` | Check only entries not found in previous runs |
-| `/bib-verify <key>` | Check a specific bib key (e.g. `/bib-verify roncaglia2020`) |
+| `/bib-verify all` | `--source all` |
+| `/bib-verify openalex` | `--source openalex` |
+| `/bib-verify ss` | `--source semantic-scholar` |
+| `/bib-verify opac` | `--source opac-sbn` |
+| `/bib-verify <key>` | `--key <key>` |
 
-## Workflow
+OpenAlex accepts an optional `OPENALEX_API_KEY` in the environment.
+See [OpenAlex authentication](https://help.openalex.org/api/authentication/).
+OPAC SBN is queried for books, contributions to collected volumes, reports,
+and miscellaneous entries.
 
-1. Parse `bibliography/reference.bib`
-2. For each entry, query available sources in order:
-   - **OpenAlex**: academic papers, books, chapters
-   - **Semantic Scholar**: papers, citations
-   - **OPAC SBN**: Italian library catalog (books only)
-   - **Google Scholar** (via scholarly): fallback for edge cases
-3. Generate an audit table comparing bib metadata vs source data
-4. Flag discrepancies: year mismatch, author mismatch, wrong work
-5. Suggest corrections (DOI, stable URL, BID for OPAC)
+For each key, report the status of each source:
 
-## Output Format
+- `high`, `medium`, `low` give the confidence of a candidate match.
+  Compare title, author and year and inspect the supplied identifier before
+  proposing a correction.
+- `not_found` means the query succeeded with no candidate.
+- `not_queried` means the source was outside the selected scope or the
+  entry lacked a title.
+- `error` means the request failed or the response was unusable.
 
-For each entry, report:
-
-```
-<key> | <bib_title> | <source> | score | match? | notes
-```
-
-Where the status is:
-- `✅` match confirmed (title + author + year)
-- `🔶` partial match (title matches, but year/author differs)
-- `⚠️` low confidence (unrelated result)
-- `❌` not found in any source
-
-## Scripts
-
-| Script | Purpose |
-|---|---|
-| `scripts/verify_all.py` | Check all entries against all sources |
-| `scripts/verify_openalex.py` | Check against OpenAlex only |
-| `scripts/verify_opac.py` | Check Italian entries against OPAC SBN |
-| `scripts/update_bib.py` | Apply suggested corrections to .bib |
+Report bibliographic corrections for review. Apply approved corrections to
+the named BibTeX file and re-run the audit for the affected keys.
